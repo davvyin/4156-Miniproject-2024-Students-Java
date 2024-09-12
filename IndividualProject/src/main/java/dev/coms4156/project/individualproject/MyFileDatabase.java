@@ -1,7 +1,14 @@
 package dev.coms4156.project.individualproject;
 
-import java.io.*;
-import java.util.*;
+import java.io.ObjectOutputStream;
+import java.io.ObjectInputStream;
+
+import java.io.FileOutputStream;
+import java.io.FileInputStream;
+
+import java.io.IOException;
+import java.util.Map;
+import java.util.HashMap;
 
 /**
  * This class represents a file-based database containing department mappings.
@@ -51,7 +58,8 @@ public class MyFileDatabase {
   }
 
   /**
-   * Saves the contents of the internal data structure to the file. Contents of the file are
+   * Saves the contents of the internal data structure to the file. Contents of
+   * the file are
    * overwritten with this operation.
    */
   public void saveContentsToFile() {

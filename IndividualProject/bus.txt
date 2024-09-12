@@ -1,0 +1,19 @@
+From static code analyzer:
+1.  Location: ./src/main/java/dev/coms4156/project/individualproject/Course.java:73:  
+    MissingOverride:        The method 'toString()' is missing an @Override annotation.
+    FIX: Add @Override
+2.  Location: ./src/main/java/dev/coms4156/project/individualproject/Department (multiple lines)
+    LooseCoupling:  Avoid using implementation types like 'HashMap'; use the interface instead
+    FIX: Replace the hashmap with the map interface
+3.  Location:./src/main/java/dev/coms4156/project/individualproject/Department.java:108
+    MissingOverride:        The method 'toString()' is missing an @Override annotation.
+    FIX: Add @Override
+4.  Location: ./src/main/java/dev/coms4156/project/individualproject/IndividualProjectApplication.java:37
+    LiteralsFirstInComparisons:     Position literals first in String comparisons
+    FIX: Change the expression `arg.equals("setup")` to `"setup".equals(arg)`
+5. Location: ./src/main/java/dev/coms4156/project/individualproject/IndividualProjectApplication (multiple lines)
+    LooseCoupling:  Avoid using implementation types like 'HashMap'; use the interface instead
+    FIX: Replace the hashmap with the map interface
+6. Location: ./src/main/java/dev/coms4156/project/individualproject/IndividualProjectApplication (multiple lines)
+    LooseCoupling:  Avoid using implementation types like 'HashMap'; use the interface instead
+    FIX: Replace the hashmap with the map interface
