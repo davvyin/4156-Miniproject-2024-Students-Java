@@ -1,0 +1,112 @@
+From static code analyzer:
+1.  Location: ./src/main/java/dev/coms4156/project/individualproject/Course.java:73:
+    MissingOverride:        The method 'toString()' is missing an @Override annotation.
+    FIX: Add @Override
+2.  Location: ./src/main/java/dev/coms4156/project/individualproject/Department (multiple lines)
+    LooseCoupling:  Avoid using implementation types like 'HashMap'; use the interface instead
+    FIX: Replace the hashmap with the map interface
+3.  Location:./src/main/java/dev/coms4156/project/individualproject/Department.java:108
+    MissingOverride:        The method 'toString()' is missing an @Override annotation.
+    FIX: Add @Override
+4.  Location: ./src/main/java/dev/coms4156/project/individualproject/IndividualProjectApplication.java:37
+    LiteralsFirstInComparisons:     Position literals first in String comparisons
+    FIX: Change the expression `arg.equals("setup")` to `"setup".equals(arg)`
+5.  Location: ./src/main/java/dev/coms4156/project/individualproject/IndividualProjectApplication (multiple lines)
+    LooseCoupling:  Avoid using implementation types like 'HashMap'; use the interface instead
+    FIX: Replace the hashmap with the map interface
+6.  Location: ./src/main/java/dev/coms4156/project/individualproject/MyFileDatabase (multiple lines)
+    LooseCoupling:  Avoid using implementation types like 'HashMap'; use the interface instead
+    FIX: Replace the hashmap with the map interface
+7.  Location: ./src/main/java/dev/coms4156/project/individualproject/MyFileDatabase.java:56
+    ReturnEmptyCollectionRatherThanNull:    Return an empty collection rather than null.
+    FIX: Change `return null;` to `return Collections.emptyMap();`
+8.  Location: ./src/main/java/dev/coms4156/project/individualproject/RouteController (multiple lines)
+    LooseCoupling:  Avoid using implementation types like 'HashMap'; use the interface instead
+    FIX: Replace the hashmap with the map interface
+9.  Location: ./src/main/java/dev/coms4156/project/individualproject/RouteController (multiple lines)
+    UnnecessaryAnnotationValueElement:      Avoid the use of value in annotations when its the only element
+    FIX: Remove the unecessary annotation `value=`
+10. Location: ./src/main/java/dev/coms4156/project/individualproject/RouteController (multiple lines)
+    UseLocaleWithCaseConversions:   When doing a String.toLowerCase()/toUpperCase() call, use a Locale
+    FIX: Change expression `!departmentMapping.containsKey(deptCode.toUpperCase())` to `!departmentMapping.containsKey(deptCode.toUpperCase(Locale.ROOT))`
+
+
+
+From the unit test suite:
+
+Course File:
+1.  Location: ./src/main/java/dev/coms4156/project/individualproject/Course
+    Issue: Initialize the enrolled student account is 500, which is not behavor as intended
+    Fix: Set the enrolled student account to 0
+2.  Location: ./src/main/java/dev/coms4156/project/individualproject/Course
+    Issue: Method `enrollStudent()` is not functioning properly
+    Fix: Update the function, which return false when the course full otherwise count ++ and return true
+3.  Location: ./src/main/java/dev/coms4156/project/individualproject/Course
+    Issue: Method `dropStudent()` is not functioning properly
+    Fix: Update the function, which return false when the has no student otherwise count -- and return true
+4.  Location: ./src/main/java/dev/coms4156/project/individualproject/Course
+    Issue: Method `getCourseLocation()` is not functioning properly
+    Fix: Update the function, return the courseLocation attribute
+5.  Location: ./src/main/java/dev/coms4156/project/individualproject/Course
+    Issue: Method `getInstructorName()` is not functioning properly
+    Fix: Update the function, return the instructorName attribute
+6.   Location: ./src/main/java/dev/coms4156/project/individualproject/Course
+    Issue: Method `isCourseFull()` is not behavioring as expeceted
+    Fix: Update the function, check if the enrolledStudentCount is more then or equals to the enrollmentCapacity
+
+Department File:
+7.  Location: ./src/main/java/dev/coms4156/project/individualproject/Department
+    Issue: Method `getNumberOfMajors()` is not behavioring as expeceted
+    Fix: Update the function, return numberOfmajors attribute
+8.  Location: ./src/main/java/dev/coms4156/project/individualproject/Department
+    Issue: Method `getDepartmentChair()` is not behavioring as expeceted
+    Fix: Update the function, return departmentChair attribute
+9.  Location: ./src/main/java/dev/coms4156/project/individualproject/Department
+    Issuse: Method `dropPersonFromMajor` is incomplete
+    Fix: Update the method, only drop when the numberOfmajors > 0 else do nothing
+10. Location: ./src/main/java/dev/coms4156/project/individualproject/Department
+    Issuse: Method `toString` is incorrect
+    Fix: Update the method, return result.toString() not the string literal of "result.toString()"
+
+
+RouteController File:
+11. Location: ./src/main/java/dev/coms4156/project/individualproject/Department
+    Issue: Method `retrieveDepartment` return the incorrect http status
+    Fix: when "Department Not Found", return the HttpStatus.NOT_FOUND; when the department found return the he HttpStatus.OK
+
+12. Location: ./src/main/java/dev/coms4156/project/individualproject/Department
+    Issue: Method `retrieveCourse` return the incorrect http status
+    Fix: when the Course found return the he HttpStatus.OK instead of HttpStatus.FORBIDDEN
+13. Location: ./src/main/java/dev/coms4156/project/individualproject/Department
+    Issue: Method `retrieveCourse` forgot to use the uppercase of deptCode
+    Fix: query the department use `deptCode.toUpperCase(Locale.ROOT)`
+
+14. Location: ./src/main/java/dev/coms4156/project/individualproject/Department
+    Issue: Method `isCourseFull` forgot to use the uppercase of deptCode
+    Fix: query the department use `deptCode.toUpperCase(Locale.ROOT)`
+
+15. Location: ./src/main/java/dev/coms4156/project/individualproject/Department
+    Issue: Method `getMajorCtFromDept`negative value of the number of major of a department, which is incorrect
+    Fix: Remove the `-` from the `-departmentMapping.get(deptCode).getNumberOfMajors()`
+16. Location: ./src/main/java/dev/coms4156/project/individualproject/Department
+    Issue: Method `getMajorCtFromDept` return the incorrect http status
+    Fix: when the department not found return the HttpStatus.NOT_FOUND instead
+17. Location: ./src/main/java/dev/coms4156/project/individualproject/Department
+    Issue: Method `getMajorCtFromDept` forgot to use the uppercase of deptCode
+    Fix: query the department use `deptCode.toUpperCase(Locale.ROOT)`
+
+18. Location: ./src/main/java/dev/coms4156/project/individualproject/Department
+    Issue: Method `identifyDeptChair` forgot to use the uppercase of deptCode
+    Fix: query the department use `deptCode.toUpperCase(Locale.ROOT)`
+
+19. Location: ./src/main/java/dev/coms4156/project/individualproject/Department
+    Issue: Method `findCourseLocation` forgot to use the uppercase of deptCode
+    Fix: query the department use `deptCode.toUpperCase(Locale.ROOT)`
+
+19. Location: ./src/main/java/dev/coms4156/project/individualproject/Department
+    Issue: Method `findCourseTime` response with wrong text
+    Fix: replace "some time " to requestedCourse.getCourseTimeSlot()
+
+
+
+

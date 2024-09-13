@@ -1,66 +1,49 @@
 package dev.coms4156.project.individualproject;
 
-import jakarta.annotation.PreDestroy;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.Mockito.when;
+
 import java.util.HashMap;
-import java.util.Map;
-import org.springframework.boot.CommandLineRunner;
-import org.springframework.boot.SpringApplication;
-import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.test.context.ContextConfiguration;
 
 /**
- * Class contains all the startup logic for the application.
- * DO NOT MODIFY ANYTHING BELOW THIS POINT WITH REGARD TO FUNCTIONALITY
- * YOU MAY MAKE STYLE/REFACTOR MODIFICATIONS AS NEEDED
+ * RouteController Unit tests.
  */
-@SpringBootApplication
-public class IndividualProjectApplication implements CommandLineRunner {
+@SpringBootTest
+@ContextConfiguration
+public class RouteControllerTest {
+
+  @InjectMocks
+  public RouteController routeController;
+
+  @Mock
+  public MyFileDatabase myFileDatabase;
+
+  public HashMap<String, Department> departmentMapping;
 
   /**
-   * The main launcher for the service all it does
-   * is make a call to the overridden run method.
-   *
-   * @param args A {@code String[]} of any potential
-   *             runtime arguments
+   * Use Mockito setup the mock test data before each test.
    */
-  public static void main(String[] args) {
-    SpringApplication.run(IndividualProjectApplication.class, args);
+  @BeforeEach
+  public void setup() {
+    MockitoAnnotations.openMocks(this);
+    departmentMapping = new HashMap<>();
+    setupMockData();
+    when(myFileDatabase.getDepartmentMapping()).thenReturn(departmentMapping);
   }
 
   /**
-   * This contains all the setup logic, it will mainly be focused
-   * on loading up and creating an instance of the database based
-   * off a saved file or will create a fresh database if the file
-   * is not present.
-   *
-   * @param args A {@code String[]} of any potential runtime args
+   * Helper method for loading the data to the departmetnMapping.
    */
-  public void run(String[] args) {
-    for (String arg : args) {
-      if ("setup".equals(arg)) {
-        myFileDatabase = new MyFileDatabase(1, "./data.txt");
-        resetDataFile();
-        System.out.println("System Setup");
-        return;
-      }
-    }
-    myFileDatabase = new MyFileDatabase(0, "./data.txt");
-    System.out.println("Start up");
-  }
-
-  /**
-   * Overrides the database reference, used when testing.
-   *
-   * @param testData A {@code MyFileDatabase} object referencing test data.
-   */
-  public static void overrideDatabase(MyFileDatabase testData) {
-    myFileDatabase = testData;
-    saveData = false;
-  }
-
-  /**
-   * Allows for data to be reset in event of errors.
-   */
-  public void resetDataFile() {
+  public void setupMockData() {
     String[] times = { "11:40-12:55", "4:10-5:25", "10:10-11:25", "2:40-3:55" };
     String[] locations = { "417 IAB", "309 HAV", "301 URIS" };
 
@@ -81,7 +64,7 @@ public class IndividualProjectApplication implements CommandLineRunner {
     coms3827.setEnrolledStudentCount(283);
     Course coms4156 = new Course("Gail Kaiser", "501 NWC", times[2], 120);
     coms4156.setEnrolledStudentCount(109);
-    Map<String, Course> courses = new HashMap<>();
+    HashMap<String, Course> courses = new HashMap<>();
     courses.put("1004", coms1004);
     courses.put("3134", coms3134);
     courses.put("3157", coms3157);
@@ -91,7 +74,7 @@ public class IndividualProjectApplication implements CommandLineRunner {
     courses.put("3827", coms3827);
     courses.put("4156", coms4156);
     Department compSci = new Department("COMS", courses, "Luca Carloni", 2700);
-    Map<String, Department> mapping = new HashMap<>();
+    HashMap<String, Department> mapping = new HashMap<>();
     mapping.put("COMS", compSci);
 
     // data for econ dept
@@ -280,23 +263,229 @@ public class IndividualProjectApplication implements CommandLineRunner {
     Department psyc = new Department("PSYC", courses, "Nim Tottenham", 437);
     mapping.put("PSYC", psyc);
 
-    myFileDatabase.setMapping(mapping);
+    this.departmentMapping = mapping;
   }
 
-  /**
-   * This contains all the overheading teardown logic, it will
-   * mainly be focused on saving all the created user data to a
-   * file, so it will be ready for the next setup.
+  @Test
+  public void testRetrieveDepartmentFail() {
+    ResponseEntity<?> response = routeController.retrieveDepartment("DS");
+    assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
+    // assertEquals(department.toString(), response.getBody());
+  }
+
+  @Test
+  public void testRetrieveDepartmentSuccess() {
+    ResponseEntity<?> response = routeController.retrieveDepartment("COMS");
+    assertEquals(HttpStatus.OK, response.getStatusCode());
+    // assertEquals(department.toString(), response.getBody());
+  }
+
+  @Test
+  public void testRetrieveCourseFail() {
+    ResponseEntity<?> response = routeController.retrieveCourse("CHEM", 1000);
+    assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
+    assertEquals("Course Not Found", response.getBody());
+
+  }
+
+  @Test
+  public void testRetrieveCourseSuccess() {
+    ResponseEntity<?> response = routeController.retrieveCourse("CHEM", 1403);
+    assertEquals(HttpStatus.OK, response.getStatusCode());
+    // assertEquals(department.toString(), response.getBody());
+  }
+
+  @Test
+  public void testIsCourseFullNotFull() {
+    // COMS 1004 is not full, as it has 249 enrolled out of 400
+    ResponseEntity<?> response = routeController.isCourseFull("COMS", 1004);
+    assertEquals(HttpStatus.OK, response.getStatusCode());
+    assertEquals(false, response.getBody()); // course is not full
+  }
+
+  @Test
+  public void testIsCourseFullFull() {
+    routeController.setEnrollmentCount("COMS", 4156, 120);
+    ResponseEntity<?> response = routeController.isCourseFull("COMS", 4156);
+
+    assertEquals(HttpStatus.OK, response.getStatusCode());
+    assertEquals(true, response.getBody()); // course full
+  }
+
+  @Test
+  public void testIsCourseFullNotFound() {
+    ResponseEntity<?> response = routeController.isCourseFull("COMS", 4006);
+    assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
+    assertEquals("Course Not Found", response.getBody());
+  }
+
+  @Test
+  public void testIsCourseFullDepartmentNotFound() {
+    ResponseEntity<?> response = routeController.isCourseFull("DS", 1004);
+    assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
+  }
+
+  /*
+   * Tests for getMajorCtFromDept
    */
-  @PreDestroy
-  public void onTermination() {
-    System.out.println("Termination");
-    if (saveData) {
-      myFileDatabase.saveContentsToFile();
-    }
+
+  @Test
+  public void testGetMajorCountFromDeptSuccess() {
+    ResponseEntity<?> response = routeController.getMajorCtFromDept("COMS");
+    assertEquals(HttpStatus.OK, response.getStatusCode());
+    assertEquals("There are: 2700 majors in the department", response.getBody());
   }
 
-  // Database Instance
-  public static MyFileDatabase myFileDatabase;
-  private static boolean saveData = true;
+  @Test
+  public void testGetMajorCountFromDeptDepartmentNotFound() {
+    ResponseEntity<?> response = routeController.getMajorCtFromDept("DS");
+    assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
+    assertEquals("Department Not Found", response.getBody());
+  }
+
+  @Test
+  public void testGetMajorCountFromDeptSuccessCaseInsensetive() {
+    ResponseEntity<?> response = routeController.getMajorCtFromDept("CoMS");
+    assertEquals(HttpStatus.OK, response.getStatusCode());
+    assertEquals("There are: 2700 majors in the department", response.getBody());
+  }
+
+  /*
+   * Tests for identifyDeptChair
+   */
+  @Test
+  public void testIdentifyDeptChairSuccess() {
+    ResponseEntity<?> response = routeController.identifyDeptChair("COMS");
+    assertEquals(HttpStatus.OK, response.getStatusCode());
+    assertEquals("Luca Carloni is the department chair.", response.getBody());
+  }
+
+  @Test
+  public void testIdentifyDeptChairDepartmentNotFound() {
+    ResponseEntity<?> response = routeController.identifyDeptChair("DS");
+    assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
+    assertEquals("Department Not Found", response.getBody());
+  }
+
+  @Test
+  public void testIdentifyDeptChairCaseInsensitive() {
+    ResponseEntity<?> response = routeController.identifyDeptChair("coms");
+    assertEquals(HttpStatus.OK, response.getStatusCode());
+    assertEquals("Luca Carloni is the department chair.", response.getBody());
+  }
+
+  /*
+   * Tests for find course location
+   */
+
+  @Test
+  public void testFindCourseLocationSuccess() {
+    ResponseEntity<?> response = routeController.findCourseLocation("COMS", 1004);
+    assertEquals(HttpStatus.OK, response.getStatusCode());
+    assertEquals("417 IAB is where the course is located.", response.getBody());
+  }
+
+  @Test
+  public void testFindCourseLocationCourseNotFound() {
+    ResponseEntity<?> response = routeController.findCourseLocation("COMS", 9999);
+    assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
+    assertEquals("Course Not Found", response.getBody());
+  }
+
+  @Test
+  public void testFindCourseLocationDepartmentNotFound() {
+    ResponseEntity<?> response = routeController.findCourseLocation("DS", 1004);
+    assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
+    assertEquals("Course Not Found", response.getBody());
+  }
+
+  @Test
+  public void testFindCourseLocationCaseInsensitive() {
+    ResponseEntity<?> response = routeController.findCourseLocation("coms", 1004);
+    assertEquals(HttpStatus.OK, response.getStatusCode());
+    assertEquals("417 IAB is where the course is located.", response.getBody());
+  }
+
+  /*
+   * Tests for findCourseInstructor
+   */
+  @Test
+  public void testFindCourseInstructorSuccess() {
+    ResponseEntity<?> response = routeController.findCourseInstructor("COMS", 1004);
+    assertEquals(HttpStatus.OK, response.getStatusCode());
+    assertEquals("Adam Cannon is the instructor for the course.", response.getBody());
+  }
+
+  @Test
+  public void testFindCourseInstructorCourseNotFound() {
+    ResponseEntity<?> response = routeController.findCourseInstructor("COMS", 9999);
+    assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
+    assertEquals("Course Not Found", response.getBody());
+  }
+
+  @Test
+  public void testFindCourseInstructorDepartmentNotFound() {
+    ResponseEntity<?> response = routeController.findCourseInstructor("DS", 1004);
+    assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
+    assertEquals("Course Not Found", response.getBody());
+  }
+
+  /*
+   * Tests for findCourseTime
+   */
+  @Test
+  public void testFindCourseTimeSuccess() {
+    ResponseEntity<?> response = routeController.findCourseTime("COMS", 1004);
+    assertEquals(HttpStatus.OK, response.getStatusCode());
+    assertEquals("The course meets at: 11:40-12:55", response.getBody());
+  }
+
+  @Test
+  public void testFindCourseTimeCourseNotFound() {
+    ResponseEntity<?> response = routeController.findCourseTime("COMS", 9999);
+    assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
+    assertEquals("Course Not Found", response.getBody());
+  }
+
+  @Test
+  public void testFindCourseTimeDepartmentNotFound() {
+    ResponseEntity<?> response = routeController.findCourseTime("DS", 1004);
+    assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
+    assertEquals("Course Not Found", response.getBody());
+  }
+
+  /*
+   * Tests for add major to dept
+   */
+  @Test
+  public void testAddMajorToDeptSuccess() {
+    ResponseEntity<?> response = routeController.addMajorToDept("COMS");
+    assertEquals(HttpStatus.OK, response.getStatusCode());
+    assertEquals("Attribute was updated successfully", response.getBody());
+  }
+
+  @Test
+  public void testAddMajorToDeptDepartmentNotFound() {
+    ResponseEntity<?> response = routeController.addMajorToDept("DS");
+    assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
+    assertEquals("Department Not Found", response.getBody());
+  }
+
+  /*
+   * Tests for remove major to dept
+   */
+  @Test
+  public void testRemoveMajorToDeptSuccess() {
+    ResponseEntity<?> response = routeController.removeMajorFromDept("COMS");
+    assertEquals(HttpStatus.OK, response.getStatusCode());
+    assertEquals("Attribute was updated or is at minimum", response.getBody());
+  }
+
+  @Test
+  public void testRemoveMajorToDeptFail() {
+    ResponseEntity<?> response = routeController.addMajorToDept("DS");
+    assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
+    assertEquals("Department Not Found", response.getBody());
+  }
+
 }
