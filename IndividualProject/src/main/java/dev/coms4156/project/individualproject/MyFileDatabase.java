@@ -56,7 +56,8 @@ public class MyFileDatabase {
   }
 
   /**
-   * Saves the contents of the internal data structure to the file. Contents of the file are
+   * Saves the contents of the internal data structure to the file. Contents of
+   * the file are
    * overwritten with this operation.
    */
   public void saveContentsToFile() {
