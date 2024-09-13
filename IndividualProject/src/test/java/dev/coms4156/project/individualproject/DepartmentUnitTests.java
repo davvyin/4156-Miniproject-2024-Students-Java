@@ -1,12 +1,10 @@
 package dev.coms4156.project.individualproject;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.HashMap;
-
-// import org.junit.jupiter.api.BeforeAll;
+import java.util.Map;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -21,10 +19,16 @@ public class DepartmentUnitTests {
   public Department testDepartment;
   public Course sampleCourse;
 
+  /**
+   * Sets up a sample department for testing purposes.
+   * Initializes a test department with a sample course and
+   * assigns an instructor and enrollment capacity.
+   */
   @BeforeEach
   public void setupDepartmentForTesting() {
+
     sampleCourse = new Course("Griffin Newbold", "417 IAB", "11:40-12:55", 250);
-    HashMap<String, Course> courses = new HashMap<>();
+    Map<String, Course> courses = new HashMap<>();
     courses.put("COMS4156", sampleCourse);
     testDepartment = new Department("CS", courses, "ABC", 100);
   }
@@ -62,7 +66,7 @@ public class DepartmentUnitTests {
 
   @Test
   public void getCourseSelectionTest() {
-    HashMap<String, Course> courseSelection = testDepartment.getCourseSelection();
+    Map<String, Course> courseSelection = testDepartment.getCourseSelection();
     assertEquals(1, courseSelection.size());
     assertTrue(courseSelection.containsKey("COMS4156"));
     assertEquals(sampleCourse, courseSelection.get("COMS4156"));
@@ -72,7 +76,7 @@ public class DepartmentUnitTests {
   public void addCourseTest() {
     Course newCourse = new Course("James", "500 Mudd", "2:00-3:15", 100);
     testDepartment.addCourse("COMS4111", newCourse);
-    HashMap<String, Course> courseSelection = testDepartment.getCourseSelection();
+    Map<String, Course> courseSelection = testDepartment.getCourseSelection();
     assertEquals(2, courseSelection.size());
     assertTrue(courseSelection.containsKey("COMS4111"));
     assertTrue(courseSelection.containsKey("COMS4156"));
@@ -82,7 +86,7 @@ public class DepartmentUnitTests {
   @Test
   public void createCourseTest() {
     testDepartment.createCourse("COMS4111", "James", "600 Mudd", "3:30-4:45", 200);
-    HashMap<String, Course> courseSelection = testDepartment.getCourseSelection();
+    Map<String, Course> courseSelection = testDepartment.getCourseSelection();
     assertEquals(2, courseSelection.size());
     assertTrue(courseSelection.containsKey("COMS4111"));
     Course createdCourse = courseSelection.get("COMS4111");
@@ -91,7 +95,8 @@ public class DepartmentUnitTests {
 
   @Test
   public void toStringTest() {
-    String expectedString = "CS COMS4156: \nInstructor: Griffin Newbold; Location: 417 IAB; Time: 11:40-12:55\n";
+    String expectedString = "CS COMS4156: \nInstructor: "
+        + "Griffin Newbold; Location: 417 IAB; Time: 11:40-12:55\n";
     assertEquals(expectedString, testDepartment.toString());
   }
 

@@ -4,23 +4,22 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.when;
 
 import java.util.HashMap;
-
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ContextConfiguration;
 
+/**
+ * RouteController Unit tests.
+ */
 @SpringBootTest
 @ContextConfiguration
 public class RouteControllerTest {
-  // @InjectMocks
-  // public static RouteController routeController;
-  // public static IndividualProjectApplication myapp;
 
   @InjectMocks
   public RouteController routeController;
@@ -30,6 +29,9 @@ public class RouteControllerTest {
 
   public HashMap<String, Department> departmentMapping;
 
+  /**
+   * Use Mockito setup the mock test data before each test.
+   */
   @BeforeEach
   public void setup() {
     MockitoAnnotations.openMocks(this);
@@ -38,6 +40,9 @@ public class RouteControllerTest {
     when(myFileDatabase.getDepartmentMapping()).thenReturn(departmentMapping);
   }
 
+  /**
+   * Helper method for loading the data to the departmetnMapping.
+   */
   public void setupMockData() {
     String[] times = { "11:40-12:55", "4:10-5:25", "10:10-11:25", "2:40-3:55" };
     String[] locations = { "417 IAB", "309 HAV", "301 URIS" };
