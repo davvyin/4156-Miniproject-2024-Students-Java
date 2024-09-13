@@ -100,7 +100,7 @@ public class Course implements Serializable {
   @Serial
   private static final long serialVersionUID = 123456L;
   private final int enrollmentCapacity;
-  private int enrolledStudentCount;
+  public int enrolledStudentCount;
   private String courseLocation;
   private String instructorName;
   private String courseTimeSlot;

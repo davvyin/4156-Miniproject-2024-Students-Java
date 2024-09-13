@@ -488,4 +488,31 @@ public class RouteControllerTest {
     assertEquals("Department Not Found", response.getBody());
   }
 
+  /*
+   * Tests for drop student from course
+   */
+  @Test
+  public void testDropStudentFromCourseSuccess() {
+    // departmentMapping.get("COMS").getCourseSelection().get("1004").setEnrolledStudentCount(249);
+    routeController.setEnrollmentCount("COMS", 1004, 249);
+    ResponseEntity<?> response = routeController.dropStudent("COMS", 1004);
+    assertEquals(HttpStatus.OK, response.getStatusCode());
+    assertEquals("Student has been dropped.", response.getBody());
+  }
+
+  @Test
+  public void testDropStudentFromCourseNotFound() {
+    ResponseEntity<?> response = routeController.dropStudent("COMS", 10024);
+    assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
+    assertEquals("Course Not Found", response.getBody());
+  }
+
+  @Test
+  public void testDropStudentFromCourseFail() {
+    routeController.setEnrollmentCount("COMS", 1004, 0);
+    ResponseEntity<?> response = routeController.dropStudent("COMS", 1004);
+    assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
+    assertEquals("Student has not been dropped.", response.getBody());
+  }
+
 }
