@@ -1,0 +1,6 @@
+Citations:
+
+
+1. https://pmd.github.io/
+2. https://site.mockito.org/
+3. https://www.youtube.com/watch?v=4l3EFprMqpU
