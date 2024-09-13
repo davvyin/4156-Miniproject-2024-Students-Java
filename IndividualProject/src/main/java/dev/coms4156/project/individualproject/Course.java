@@ -73,8 +73,8 @@ public class Course implements Serializable {
   @Override
   public String toString() {
     return "\nInstructor: " + instructorName
-        + "; Location: " + courseLocation
-        + "; Time: " + courseTimeSlot;
+            + "; Location: " + courseLocation
+            + "; Time: " + courseTimeSlot;
   }
 
   public void reassignInstructor(String newInstructorName) {
